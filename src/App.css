@@ -1,0 +1,26 @@
+.main {
+  max-width: 1700px;
+  margin: auto;
+  border: 1px solid gray;
+}
+
+.main h1 {
+text-align: center;
+}
+
+.operationButtons {
+  display: flex;
+  justify-content: end;
+  margin-right: 20px;
+  gap: 20px;
+}
+
+.inButton{
+background-color: #008000 ;
+color: #fff;
+}
+
+.outButton{
+  background-color: #FF0000 ;
+  color: #fff;
+  }
