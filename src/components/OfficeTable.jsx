@@ -3,23 +3,16 @@ import axios from 'axios';
 import {
   Button,
   Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  TextField,
-  Modal,
-  Box,
-  IconButton,
-  CircularProgress,
-  Typography,
-  Grid
+  TableBody,TableCell,TableContainer,TableHead,TableRow,Paper,TextField,InputAdornment,Modal,Box,IconButton,CircularProgress,Typography, Grid,  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
 } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon, Visibility as VisibilityIcon } from '@mui/icons-material';
-
+import SearchIcon from '@mui/icons-material/Search';
 import AddTableModal from './AddTableModal';
+import * as XLSX from 'xlsx';
+import DownloadIcon from '@mui/icons-material/Download';
 
 const OfficeTable = () => {
   const [tables, setTables] = useState([]);
@@ -30,6 +23,9 @@ const OfficeTable = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [tableToView, setTableToView] = useState(null);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [tableToDelete, setTableToDelete] = useState(null);
+  
 
   // Fetch tables from the API
   useEffect(() => {
@@ -133,6 +129,33 @@ const OfficeTable = () => {
     setSearchQuery(e.target.value);
   };
 
+  const handleDeleteClick = (table) => {
+    setTableToDelete(table);  // Set the table to be deleted
+    setOpenDialog(true);  // Open the dialog
+  };
+
+  const handleDeleteConfirm = () => {
+    if (!tableToDelete) return;
+
+    setLoading(true);
+    axios.delete(`http://localhost:3000/api/tables/${tableToDelete._id}`)
+      .then(() => {
+        setTables((prevTables) => prevTables.filter(table => table._id !== tableToDelete._id));
+        setOpenDialog(false);  // Close the dialog after deletion
+      })
+      .catch(error => {
+        console.error('Error deleting table:', error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setTableToDelete(null);  // Reset the table to delete
+  };
+
   // Filtered tables based on search query
   const filteredTables = tables.filter((table) => {
     const queryLower = searchQuery.toLowerCase();
@@ -143,56 +166,134 @@ const OfficeTable = () => {
     );
   });
 
+  const sortedTables = filteredTables.sort((a, b) => {
+    // Compare room names to ensure rooms appear in order (e.g., Room 1, Room 2, etc.)
+    if (a.room < b.room) return -1;
+    if (a.room > b.room) return 1;
+    return 0;
+  });
+
+  const exportModalData = () => {
+     // Get the modal content (all the content inside the modal)
+  const modalContent = document.querySelector('#modal-contents');
+
+  if (!modalContent) {
+    alert("No modal content to export!");
+    return;
+  }
+
+  // Create a worksheet from the modal's HTML content
+  const worksheet = XLSX.utils.html_to_sheet(modalContent);
+
+  // Create a workbook and append the worksheet
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Modal Content');
+
+  // Export the workbook to Excel
+  XLSX.writeFile(workbook, 'modal_content.xlsx');
+  };
+
+
+
   return (
     <div>
-      <TextField
-        label="Search by Name, Location, or Employee"
-        variant="outlined"
-        value={searchQuery}
-        onChange={handleSearchChange}
-        fullWidth
-        margin="normal"
-      />
-      <Button variant="contained" color="primary" onClick={handleAddClick}>
-        Add New Table
-      </Button>
+
+<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 25 }}>
+  {/* Add New Table button on the left */}
+  <Button variant="contained" color="primary" onClick={handleAddClick}>
+    Add New Table
+  </Button>
+  
+  {/* Search input on the right */}
+  <TextField
+    label="Search by Name, Location, or Employee"
+    variant="outlined"
+    value={searchQuery}
+    onChange={handleSearchChange}
+    fullWidth
+    margin="normal"
+    InputProps={{
+      endAdornment: (
+        <InputAdornment position="end">
+          <SearchIcon />
+        </InputAdornment>
+      ),
+    }}
+    sx={{
+      maxWidth: 500, // Set max width to 500px
+      width: '100%', // Ensures that the TextField takes full width until the max-width is reached
+    }}
+  />
+</div>
+
+    
+
 
       <TableContainer component={Paper} sx={{ marginTop: '20px' }}>
-        {loading ? (
-          <CircularProgress />
-        ) : (
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell>Location</TableCell>
-                <TableCell>Employee</TableCell>
-                <TableCell>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredTables.map((table) => (
-                <TableRow key={table._id}>
-                  <TableCell>{table.name}</TableCell>
-                  <TableCell>{table.location}</TableCell>
-                  <TableCell>{table.employee}</TableCell>
-                  <TableCell>
-                    <IconButton onClick={() => handleViewClick(table)} color="primary">
-                      <VisibilityIcon />
-                    </IconButton>
-                    <IconButton onClick={() => handleEditClick(table)} color="secondary">
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton onClick={() => handleDeleteTable(table._id)} color="error">
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </TableContainer>
+  {loading ? (
+    <CircularProgress />
+  ) : (
+    <Table className='filtered-table'>
+      <TableHead>
+        <TableRow>
+          <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
+          <TableCell sx={{ fontWeight: 'bold' }}>Location</TableCell>
+          <TableCell sx={{ fontWeight: 'bold' }}>Employee</TableCell>
+          <TableCell sx={{ fontWeight: 'bold' }}>Items</TableCell> 
+          <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell> 
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {sortedTables.map((table) => (
+          <TableRow key={table._id}>
+            <TableCell>{table.name}</TableCell>
+            <TableCell>{table.location}</TableCell>
+            <TableCell>{table.employee}</TableCell>
+            
+            {/* View icon in a new column */}
+            <TableCell>
+              <IconButton onClick={() => handleViewClick(table)} color="primary">
+                <VisibilityIcon />
+              </IconButton>
+            </TableCell>
+            
+            <TableCell>
+              <IconButton onClick={() => handleEditClick(table)} color="secondary">
+                <EditIcon />
+              </IconButton>
+              <IconButton onClick={() => handleDeleteClick(table)} color="error">
+                
+                <DeleteIcon />
+              </IconButton>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  )}
+</TableContainer>
+
+<Dialog open={openDialog} onClose={handleCloseDialog}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          {tableToDelete && (
+            <>
+              <Typography variant="body1">Are you sure you want to delete this table?</Typography>
+              <Typography variant="body2"><strong>Name:</strong> {tableToDelete.name}</Typography>
+              <Typography variant="body2"><strong>Location:</strong> {tableToDelete.location}</Typography>
+              <Typography variant="body2"><strong>Employee:</strong> {tableToDelete.employee}</Typography>
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDeleteConfirm} color="error">
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Add Table / Edit Table Modal */}
       <AddTableModal
@@ -204,55 +305,76 @@ const OfficeTable = () => {
       />
 
       {/* View Table Modal with Assigned Items */}
-   <Modal
-  open={viewModalOpen}
-  onClose={handleCloseModal}
-  aria-labelledby="view-table-modal"
-  aria-describedby="view-table-modal-description"
->
-  <Box sx={{
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 600,  // You can adjust this width as needed
-    bgcolor: 'background.paper',
-    borderRadius: 2,
-    boxShadow: 24,
-    p: 4,
-    maxHeight: '80vh',  // Ensure the modal doesn't overflow
-    overflowY: 'auto',  // Make the modal scrollable if needed
-  }}>
-    <Typography variant="h6" component="h2" gutterBottom>
-      Assigned Items
-    </Typography>
-    
-    {assignedItems.length > 0 ? (
-      <Grid container spacing={2}>  {/* Grid container with spacing between items */}
-        {assignedItems.map((item, index) => (
-          <Grid item xs={6} key={index}> {/* Two columns layout, xs=6 means 50% width */}
-            <Box sx={{ marginBottom: 2 }}> {/* Box around each item */}
-              <Typography><strong>Item Name:</strong> {item.name}</Typography>
-              <Typography><strong>Description:</strong> {item.description}</Typography>
-              <Typography><strong>Serial Number:</strong> {item.serial_number}</Typography>
-            </Box>
-          </Grid>
-        ))}
-      </Grid>
-    ) : (
-      <Typography>No items assigned to this table.</Typography>
-    )}
+      <Modal
+      open={viewModalOpen}
+      onClose={handleCloseModal}
+      aria-labelledby="view-table-modal"
+      aria-describedby="view-table-modal-description"
 
-    <Button
-      onClick={handleCloseModal}
-      variant="contained"
-      color="primary"
-      sx={{ marginTop: 2 }}
     >
-      Close
-    </Button>
-  </Box>
-</Modal>
+  
+      <Box sx={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 600,  // Adjust the width as needed
+        bgcolor: 'background.paper',
+        borderRadius: 2,
+        boxShadow: 24,
+        p: 4,
+        maxHeight: '80vh',  // Ensure the modal doesn't overflow
+        overflowY: 'auto',  // Make the modal scrollable if needed
+      }}>
+        <IconButton
+  onClick={exportModalData} style={{ position: 'absolute', right: '100px', backgroundColor: '#4caf50', color: 'white',   border: '2px solid #388e3c', padding: '5px',   borderRadius: '5px', 
+    fontSize: '16px',     cursor: 'pointer',   fontWeight: 'bold',transition: 'background-color 0.3s ease',
+  }}
+  onMouseOver={(e) => (e.target.style.backgroundColor = '#45a049')} // Hover effect
+  onMouseOut={(e) => (e.target.style.backgroundColor = '#4caf50')} // Hover effect reset
+>
+<DownloadIcon />
+  </IconButton>
+        <div >
+          <h6>Assigned Items: <strong> {tableToView && tableToView.employee ? tableToView.employee : 'N/A'}</strong></h6>
+        </div>
+
+        {/* Table to display the assigned items */}
+        {assignedItems.length > 0 ? (
+          <TableContainer sx={{ maxHeight: '60vh', overflow: 'auto' }} className='filtered-table'>
+            <Table aria-label="assigned items table">
+              <TableHead>
+                <TableRow>
+                  <TableCell><strong>Item Name</strong></TableCell>
+                  <TableCell><strong>Description</strong></TableCell>
+                  <TableCell><strong>Serial Number</strong></TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {assignedItems.map((item, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{item.name}</TableCell>
+                    <TableCell>{item.description}</TableCell>
+                    <TableCell>{item.serial_number}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        ) : (
+          <Typography>No items assigned to this table.</Typography>
+        )}
+
+        <Button
+          onClick={handleCloseModal}
+          variant="contained"
+          color="primary"
+          sx={{ marginTop: 2 }}
+        >
+          Close
+        </Button>
+      </Box>
+    </Modal>
     </div>
   );
 };

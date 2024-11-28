@@ -6,13 +6,18 @@
 
 .main h1 {
 text-align: center;
+color: #842E92;
 }
 
 .operationButtons {
   display: flex;
-  justify-content: end;
-  margin-right: 20px;
-  gap: 20px;
+  justify-content: space-between;
+  align-items: center; /* Align vertically centered */
+  width: 100%; /* Make sure it takes up the full width */
+}
+
+.operationButtons input {
+  width: 200px; /* Optional: Sets a fixed width for the search input */
 }
 
 .inButton{
@@ -23,4 +28,18 @@ color: #fff;
 .outButton{
   background-color: #FF0000 ;
   color: #fff;
+  }
+
+  input, textarea, select {
+    /* These rules make sure no suggestions appear for these fields */
+    -webkit-appearance: none;   /* Remove browser-specific styling in webkit browsers */
+    -moz-appearance: none;      /* Remove browser-specific styling in Firefox */
+    appearance: none;           /* Generic way of removing browser appearance for form fields */
+  }
+
+  body {
+    text-transform: uppercase;
+    overflow-x: hidden;
+    max-height: 100vh;
+
   }

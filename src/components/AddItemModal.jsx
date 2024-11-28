@@ -19,7 +19,7 @@ import axios from 'axios';
 const AddItemModal = ({ open, onClose, addItem, updateItem, editItem }) => {
   const initialState = {
     name: '',
-    quantity: 0,
+    sku:'', 
     description: '',
     condition: '',
     price: '',
@@ -82,14 +82,18 @@ const AddItemModal = ({ open, onClose, addItem, updateItem, editItem }) => {
   const handleAssignedToChange = (event, newValue) => {
     setNewItem((prevItem) => ({
       ...prevItem,
-      assigned_to: newValue ? newValue : null, // Store the whole object, not just the _id
-      location: newValue ? newValue.location : '', // Update location
-      status: newValue ? 'used' : prevItem.status, // Change status to "used" if assigned
+      assigned_to: newValue ? newValue : null, 
+      location: newValue ? newValue.location : '', 
+      status: newValue ? 'used' : prevItem.status, 
     }));
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    if (newItem.name) newItem.name = newItem.name.toUpperCase();
+    if (newItem.location) newItem.location = newItem.location.toUpperCase();
+    if (newItem.employee) newItem.employee = newItem.employee.toUpperCase();
 
     if (!newItem.purchase_date) {
       newItem.purchase_date = '';
@@ -160,13 +164,14 @@ const AddItemModal = ({ open, onClose, addItem, updateItem, editItem }) => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label="Quantity"
-                  type="number"
+                  label="SKU"
                   variant="outlined"
-                  name="quantity"
-                  value={newItem.quantity}
+                  name="sku"
+                  value={newItem.sku}
                   onChange={handleInputChange}
                 />
+              </Grid>
+              <Grid item xs={12} sm={6}>
               </Grid>
               <Grid item xs={12}>
                 <TextField
@@ -179,14 +184,19 @@ const AddItemModal = ({ open, onClose, addItem, updateItem, editItem }) => {
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Condition"
-                  variant="outlined"
-                  name="condition"
-                  value={newItem.condition}
-                  onChange={handleInputChange}
-                />
+              <FormControl fullWidth variant="outlined">
+  <InputLabel id="condition-label">Condition</InputLabel>
+  <Select
+    labelId="condition-label"
+    label="Condition"
+    name="condition"
+    value={newItem.condition}
+    onChange={handleInputChange}
+  >
+    <MenuItem value="Good">Good</MenuItem>
+    <MenuItem value="Defective">Defective</MenuItem>
+  </Select>
+</FormControl>
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
@@ -199,7 +209,7 @@ const AddItemModal = ({ open, onClose, addItem, updateItem, editItem }) => {
                   onChange={handleInputChange}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
                   label="Purchase By"
@@ -209,7 +219,7 @@ const AddItemModal = ({ open, onClose, addItem, updateItem, editItem }) => {
                   onChange={handleInputChange}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
                   label="Purchase Date"
@@ -237,7 +247,7 @@ const AddItemModal = ({ open, onClose, addItem, updateItem, editItem }) => {
   value={assignedToOptions.find((option) => option._id === newItem.assigned_to) || null}
   onChange={handleAssignedToChange}
   options={assignedToOptions}
-  getOptionLabel={(option) => option.name}
+  getOptionLabel={(option) => option.employee}
   renderInput={(params) => <TextField {...params} label="Assigned To" />}
   disableClearable
   isOptionEqualToValue={(option, value) => option._id === value._id}
