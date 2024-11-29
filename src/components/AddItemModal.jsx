@@ -88,13 +88,6 @@ const AddItemModal = ({ open, onClose, addItem, updateItem, editItem }) => {
     }));
   };
 
-  const handleModalClose = () => {
-    setOpenModal(false); 
-    setSelectedItem(null); 
-    setNewItem(initialState); 
-  };
-
-
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -122,7 +115,7 @@ const AddItemModal = ({ open, onClose, addItem, updateItem, editItem }) => {
 
       fetchAssignedToOptions();
       setNewItem(initialState); // Resetting form
-      handleModalClose();
+      onClose();
     } catch (error) {
       console.error('Error submitting item:', error);
       showSnackbar('Failed to submit item. Please try again.', 'error');
@@ -141,10 +134,14 @@ const AddItemModal = ({ open, onClose, addItem, updateItem, editItem }) => {
     setSnackbarOpen(false);
   };
 
+  const handleCloseModal = () => {
+    onClose(); // Close modal
+    setNewItem(initialState); // Reset the form state
+  };
 
   return (
     <>
-      <Dialog open={open} onClose={handleModalClose}>
+      <Dialog open={open} onClose={handleCloseModal}>
         <DialogTitle>{editItem ? 'Edit Item' : 'Add Item'}</DialogTitle>
         <DialogContent>
           <form onSubmit={handleSubmit}>
