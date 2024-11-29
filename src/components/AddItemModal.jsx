@@ -154,6 +154,7 @@ const AddItemModal = ({ open, onClose, addItem, updateItem, editItem }) => {
                   name="name"
                   value={newItem.name}
                   onChange={handleInputChange}
+                  autocomplete="off"
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -164,6 +165,7 @@ const AddItemModal = ({ open, onClose, addItem, updateItem, editItem }) => {
                   name="serial_number"
                   value={newItem.serial_number}
                   onChange={handleInputChange}
+                  autocomplete="off"
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -174,6 +176,7 @@ const AddItemModal = ({ open, onClose, addItem, updateItem, editItem }) => {
                   name="sku"
                   value={newItem.sku}
                   onChange={handleInputChange}
+                  autocomplete="off"
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -186,6 +189,7 @@ const AddItemModal = ({ open, onClose, addItem, updateItem, editItem }) => {
                   name="description"
                   value={newItem.description}
                   onChange={handleInputChange}
+                  autocomplete="off"
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -197,6 +201,7 @@ const AddItemModal = ({ open, onClose, addItem, updateItem, editItem }) => {
     name="condition"
     value={newItem.condition}
     onChange={handleInputChange}
+    autocomplete="off"
   >
     <MenuItem value="Good">Good</MenuItem>
     <MenuItem value="Defective">Defective</MenuItem>
@@ -212,6 +217,7 @@ const AddItemModal = ({ open, onClose, addItem, updateItem, editItem }) => {
                   name="price"
                   value={newItem.price}
                   onChange={handleInputChange}
+                  autocomplete="off"
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -222,6 +228,7 @@ const AddItemModal = ({ open, onClose, addItem, updateItem, editItem }) => {
                   name="purchase_by"
                   value={newItem.purchase_by}
                   onChange={handleInputChange}
+                  autocomplete="off"
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -234,6 +241,7 @@ const AddItemModal = ({ open, onClose, addItem, updateItem, editItem }) => {
                   value={newItem.purchase_date}
                   onChange={handleInputChange}
                   InputLabelProps={{ shrink: true }}
+                  autocomplete="off"
                 />
               </Grid>
               <Grid item xs={12}>
@@ -244,6 +252,7 @@ const AddItemModal = ({ open, onClose, addItem, updateItem, editItem }) => {
                   name="invoice"
                   value={newItem.invoice}
                   onChange={handleInputChange}
+                  autocomplete="off"
                 />
               </Grid>
 
@@ -268,6 +277,7 @@ const AddItemModal = ({ open, onClose, addItem, updateItem, editItem }) => {
                   name="location"
                   value={newItem.location}
                   onChange={handleInputChange}
+                  autocomplete="off"
                 />
               </Grid>
 
