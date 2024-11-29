@@ -94,11 +94,7 @@ useEffect(() => {
     // Just close the dialog without doing anything
     setOpenDeleteDialog(false);
   };
-  const handleModalClose = () => {
-    setOpenModal(false); // Close the modal
-    setSelectedItem(null); // Clear the selected item
-    setNewItem(initialState); // Reset form fields to initial state
-  };
+
 
   // Filter inventory (when selectedTable is 'inventory')
   const filteredInventory = inventory.filter(item => {
