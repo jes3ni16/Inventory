@@ -40,6 +40,8 @@ useEffect(() => {
       });
   };
 
+
+  
   const handleEditItem = (item) => {
 
     const newItem = { ...item }; // Create a copy of the previous state
@@ -92,7 +94,11 @@ useEffect(() => {
     // Just close the dialog without doing anything
     setOpenDeleteDialog(false);
   };
-  
+  const handleModalClose = () => {
+    setOpenModal(false); // Close the modal
+    setSelectedItem(null); // Clear the selected item
+    setNewItem(initialState); // Reset form fields to initial state
+  };
 
   // Filter inventory (when selectedTable is 'inventory')
   const filteredInventory = inventory.filter(item => {
@@ -213,7 +219,7 @@ useEffect(() => {
       {/* Modals */}
       <AddItemModal
         open={openModal}
-        onClose={() => setOpenModal(false)}
+        onClose={handleModalClose}
         addItem={(newItem) => {
           axios.post('https://inventory-server-eight.vercel.app/api/items', newItem)
             .then((response) => {
@@ -224,6 +230,7 @@ useEffect(() => {
               console.error('Error adding item:', error);
             });
         }}
+
         updateItem={(updatedItem) => {
           axios.patch(`https://inventory-server-eight.vercel.app/api/items/${updatedItem._id}`, updatedItem)
             .then((response) => {
@@ -237,6 +244,7 @@ useEffect(() => {
             });
         }}
         editItem={selectedItem}
+
       />
     </main>
   );
