@@ -121,6 +121,7 @@ const AddItemModal = ({ open, onClose, addItem, updateItem, editItem }) => {
       }
 
       fetchAssignedToOptions();
+      setNewItem(initialState); // Resetting form
       handleModalClose();
     } catch (error) {
       console.error('Error submitting item:', error);
