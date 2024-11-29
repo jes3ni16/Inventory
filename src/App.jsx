@@ -215,7 +215,10 @@ useEffect(() => {
       {/* Modals */}
       <AddItemModal
         open={openModal}
-        onClose={()=> setOpenModal(false)}
+        onClose={()=> {
+          setOpenModal(false);
+          setSelectedItem(null);
+        }}
         addItem={(newItem) => {
           axios.post('https://inventory-server-eight.vercel.app/api/items', newItem)
             .then((response) => {
