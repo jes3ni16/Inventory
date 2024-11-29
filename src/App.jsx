@@ -31,7 +31,7 @@ useEffect(() => {
   // Fetch inventory items
   const reloadInventory = () => {
     axios
-      .get('http://localhost:3000/api/items')
+      .get('https://inventory-server-eight.vercel.app/api/items')
       .then((response) => {
         setInventory(response.data);
       })
@@ -77,7 +77,7 @@ useEffect(() => {
 
   const handleConfirmDelete = () => {
     // Proceed with deletion
-    axios.delete(`http://localhost:3000/api/items/${itemToDelete._id}`)
+    axios.delete(`https://inventory-server-eight.vercel.app/api/items/${itemToDelete._id}`)
       .then(() => {
         setInventory(prevInventory => prevInventory.filter(item => item._id !== itemToDelete._id));
         setOpenDeleteDialog(false); // Close the dialog after deletion
@@ -215,7 +215,7 @@ useEffect(() => {
         open={openModal}
         onClose={() => setOpenModal(false)}
         addItem={(newItem) => {
-          axios.post('http://localhost:3000/api/items', newItem)
+          axios.post('https://inventory-server-eight.vercel.app/api/items', newItem)
             .then((response) => {
               setInventory(prevInventory => [...prevInventory, response.data]);
               setOpenModal(false);
@@ -225,7 +225,7 @@ useEffect(() => {
             });
         }}
         updateItem={(updatedItem) => {
-          axios.patch(`http://localhost:3000/api/items/${updatedItem._id}`, updatedItem)
+          axios.patch(`https://inventory-server-eight.vercel.app/api/items/${updatedItem._id}`, updatedItem)
             .then((response) => {
               setInventory(prevInventory => 
                 prevInventory.map(item => item._id === updatedItem._id ? updatedItem : item)

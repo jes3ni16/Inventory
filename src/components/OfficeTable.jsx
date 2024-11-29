@@ -30,7 +30,7 @@ const OfficeTable = () => {
   // Fetch tables from the API
   useEffect(() => {
     setLoading(true);
-    axios.get('http://localhost:3000/api/tables') // Fetch tables from the backend
+    axios.get('https://inventory-server-eight.vercel.app/api/tables') // Fetch tables from the backend
       .then(response => {
         setTables(response.data); // Set the tables with assigned items
       })
@@ -49,7 +49,7 @@ const OfficeTable = () => {
       let response;
       if (tableToEdit) {
         // Update existing table
-        response = await axios.put(`http://localhost:3000/api/tables/${tableToEdit._id}`, newTable);
+        response = await axios.put(`https://inventory-server-eight.vercel.app/api/tables/${tableToEdit._id}`, newTable);
         setTables((prevTables) =>
           prevTables.map((table) =>
             table._id === response.data._id ? response.data : table
@@ -57,7 +57,7 @@ const OfficeTable = () => {
         );
       } else {
         // Add new table
-        response = await axios.post('http://localhost:3000/api/tables', newTable);
+        response = await axios.post('https://inventory-server-eight.vercel.app/api/tables', newTable);
         setTables((prevTables) => [...prevTables, response.data]);  // Add the new table to the state
       }
       setOpenModal(false);  // Close the modal after success
@@ -71,7 +71,7 @@ const OfficeTable = () => {
 
   const fetchAssignedItems = (tableId) => {
     setLoading(true);
-    axios.get(`http://localhost:3000/api/items?assigned_to=${tableId}`)
+    axios.get(`https://inventory-server-eight.vercel.app/api/items?assigned_to=${tableId}`)
       .then(response => {
         setAssignedItems(response.data);  // Set the assigned items for the table
       })
@@ -112,7 +112,7 @@ const OfficeTable = () => {
   // Handle deleting a table
   const handleDeleteTable = (tableId) => {
     setLoading(true);
-    axios.delete(`http://localhost:3000/api/tables/${tableId}`)
+    axios.delete(`https://inventory-server-eight.vercel.app/api/tables/${tableId}`)
       .then(() => {
         setTables((prevTables) => prevTables.filter(table => table._id !== tableId));
       })
@@ -138,7 +138,7 @@ const OfficeTable = () => {
     if (!tableToDelete) return;
 
     setLoading(true);
-    axios.delete(`http://localhost:3000/api/tables/${tableToDelete._id}`)
+    axios.delete(`https://inventory-server-eight.vercel.app/api/tables/${tableToDelete._id}`)
       .then(() => {
         setTables((prevTables) => prevTables.filter(table => table._id !== tableToDelete._id));
         setOpenDialog(false);  // Close the dialog after deletion

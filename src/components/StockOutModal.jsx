@@ -12,7 +12,7 @@ const StockOutModal = ({ open, onClose, inventory, setSelectedItem, selectedItem
   // Fetch tables when the reason is 'Used'
   useEffect(() => {
     if (reason === 'used') {
-      axios.get('http://localhost:3000/api/tables')
+      axios.get('https://inventory-server-eight.vercel.app/api/tables')
         .then((response) => {
           setTables(response.data);
         })
@@ -53,10 +53,10 @@ const StockOutModal = ({ open, onClose, inventory, setSelectedItem, selectedItem
     // Make API call to process stock-out (either used or disposed)
     if (reason === 'used' && selectedTable) {
       // Add the item to the table
-      axios.post(`http://localhost:3000/api/tables/${selectedTable._id}/add-item`, { itemId: selectedItem._id, quantity })
+      axios.post(`https://inventory-server-eight.vercel.app/api/tables/${selectedTable._id}/add-item`, { itemId: selectedItem._id, quantity })
         .then(() => {
           // Update the item's status to 'used'
-          axios.put(`http://localhost:3000/api/items/${selectedItem._id}`, { status: 'used', location: selectedTable.name, quantity })
+          axios.put(`https://inventory-server-eight.vercel.app/api/items/${selectedItem._id}`, { status: 'used', location: selectedTable.name, quantity })
             .then(() => {
               alert(`Item has been assigned to table ${selectedTable.name} and marked as used`);
               reloadInventory(); // Reload inventory after updating
@@ -73,7 +73,7 @@ const StockOutModal = ({ open, onClose, inventory, setSelectedItem, selectedItem
         });
     } else if (reason === 'disposed') {
       // If the reason is 'disposed', delete the item from the database automatically
-      axios.delete(`http://localhost:3000/api/items/${selectedItem._id}`)
+      axios.delete(`https://inventory-server-eight.vercel.app/api/items/${selectedItem._id}`)
         .then(() => {
           alert(`Item ${selectedItem.name} has been disposed.`);
           reloadInventory(); // Reload inventory after disposal

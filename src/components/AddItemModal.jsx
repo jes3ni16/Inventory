@@ -44,7 +44,7 @@ const AddItemModal = ({ open, onClose, addItem, updateItem, editItem }) => {
     if (editItem) { 
       // Fetch the item details, including assigned_to, from the backend before setting it in the state
       axios
-        .get(`http://localhost:3000/api/items/${editItem._id}`)
+        .get(`https://inventory-server-eight.vercel.app/api/items/${editItem._id}`)
         .then((response) => {
           setNewItem(response.data);  // Set the full updated item
         })
@@ -60,7 +60,7 @@ const AddItemModal = ({ open, onClose, addItem, updateItem, editItem }) => {
   const fetchAssignedToOptions = () => {
     setLoadingAssignedTo(true);
     axios
-      .get('http://localhost:3000/api/tables') // Fetching tables to assign to
+      .get('https://inventory-server-eight.vercel.app/api/tables') // Fetching tables to assign to
       .then((response) => {
         setAssignedToOptions(response.data);
         setLoadingAssignedTo(false);

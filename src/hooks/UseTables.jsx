@@ -8,7 +8,7 @@ const useTables = () => {
 
   const reloadTables = () => {
     axios
-      .get('http://localhost:3000/api/tables')  // Ensure this API exists and is returning the tables correctly
+      .get('https://inventory-server-eight.vercel.app/api/tables')  // Ensure this API exists and is returning the tables correctly
       .then((response) => {
         setTables(response.data);
         setLoading(false);

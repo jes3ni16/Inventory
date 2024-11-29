@@ -8,7 +8,7 @@ const useInventory = () => {
 
   const reloadInventory = () => {
     axios
-      .get('http://localhost:3000/api/items') // Ensure the API endpoint is correct
+      .get('https://inventory-server-eight.vercel.app/api/items') // Ensure the API endpoint is correct
       .then((response) => {
         setInventory(response.data);
         setLoading(false);
