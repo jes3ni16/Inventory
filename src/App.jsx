@@ -8,6 +8,7 @@ import { Button, IconButton, ToggleButton, ToggleButtonGroup,Dialog, DialogActio
 import OfficeTable from './components/OfficeTable';
 import * as XLSX from 'xlsx';
 import DownloadIcon from '@mui/icons-material/Download';
+import LoginModal from './components/LoginModal';
 
 function App() {
   const [inventory, setInventory] = useState([]);
@@ -18,7 +19,8 @@ function App() {
   const [selectedTable, setSelectedTable] = useState('inventory');
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 const [itemToDelete, setItemToDelete] = useState(null);
-
+const [isLoggedIn, setIsLoggedIn] = useState(false);
+const [token, setToken] = useState(null);
 
 useEffect(() => {
   document.title = "Cenix Inventory"; // Set title when App component mounts
@@ -27,6 +29,35 @@ useEffect(() => {
       favicon.href = '/cenix-icon.png'; // Path to your new favicon
     }
 }, []);
+
+useEffect(() => {
+  const storedToken = localStorage.getItem('token'); // Check if token exists in localStorage
+  if (storedToken) {
+    setToken(storedToken);  // Set token state if it exists
+    setIsLoggedIn(true);  // Mark user as logged in
+  }
+}, []);
+
+
+const handleLogin = async (username, password) => {
+  try {
+    // Make API request to login
+    const response = await axios.post('https://inventory-server-eight.vercel.app/api/auth/login', {
+      username,
+      password,
+    });
+
+    // If successful, save the token and update login state
+    localStorage.setItem('token', response.data.token);  // Store the token in localStorage
+    setToken(response.data.token);
+    setIsLoggedIn(true);
+  } catch (error) {
+    // Handle login failure
+    alert('Invalid credentials');
+  }
+};
+
+
 
   // Fetch inventory items
   const reloadInventory = () => {
@@ -128,9 +159,12 @@ useEffect(() => {
 
   return (
     <main className="main">
+          {!isLoggedIn && <LoginModal onLogin={handleLogin} />}
+          {isLoggedIn && (
+            <>
       <h1>Welcome to Cenix Inventory System</h1>
 
-      {/* Table Selection Toggle */}
+
       <div className="tableToggle" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
   <ToggleButtonGroup
     value={selectedTable}
@@ -203,8 +237,8 @@ useEffect(() => {
       <DialogTitle>Confirm Deletion</DialogTitle>
       <DialogContent>
         <p> Delete the item: <strong>{itemToDelete?.name}</strong>?</p>
-        <p>Description: <strong>{itemToDelete?.location}</strong></p>
-        <p>Serial Number: <strong>{itemToDelete?.employee}</strong></p>
+        <p>Description: <strong>{itemToDelete?.description}</strong></p>
+        <p>Serial Number: <strong>{itemToDelete?.serial_number}</strong></p>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleCancelDelete} color="primary">Cancel</Button>
@@ -245,6 +279,7 @@ useEffect(() => {
         editItem={selectedItem}
 
       />
+         </> )}
     </main>
   );
 }
