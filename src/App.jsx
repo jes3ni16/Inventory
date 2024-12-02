@@ -48,7 +48,8 @@ const handleLogin = async (username, password) => {
     });
 
     // If successful, save the token and update login state
-    localStorage.setItem('token', response.data.token);  // Store the token in localStorage
+    localStorage.setItem('token', response.data.token);
+    axios.defaults.headers['Authorization'] = `Bearer ${response.data.token}`;
     setToken(response.data.token);
     setIsLoggedIn(true);
   } catch (error) {
