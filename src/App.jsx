@@ -266,7 +266,7 @@ const handleLogin = async (username, password) => {
         }}
 
         updateItem={(updatedItem) => {
-          axios.put(`https://inventory-server-eight.vercel.app/api/items/${updatedItem._id}`, updatedItem)
+          axios.patch(`https://inventory-server-eight.vercel.app/api/items/${updatedItem._id}`, updatedItem)
             .then((response) => {
               setInventory(prevInventory => 
                 prevInventory.map(item => item._id === updatedItem._id ? updatedItem : item)
