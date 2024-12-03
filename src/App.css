@@ -1,5 +1,5 @@
 .main {
-  max-width: 1700px;
+  max-width: 1800px;
   margin: auto;
   border: 1px solid gray;
 }
@@ -8,6 +8,11 @@
 text-align: center;
 color: #842E92;
 }
+
+.main td {
+ font-size: 12px;
+  }
+  
 
 .operationButtons {
   display: flex;

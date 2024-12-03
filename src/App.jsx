@@ -9,6 +9,8 @@ import OfficeTable from './components/OfficeTable';
 import * as XLSX from 'xlsx';
 import DownloadIcon from '@mui/icons-material/Download';
 import LoginModal from './components/LoginModal';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import AppRoutes from './components/AppRoutes'; 
 
 function App() {
   const [inventory, setInventory] = useState([]);
@@ -41,24 +43,22 @@ useEffect(() => {
 
 const handleLogin = async (username, password) => {
   try {
-    // Make API request to login
     const response = await axios.post('https://inventory-server-eight.vercel.app/api/auth/login', {
       username,
       password,
     });
-
-    // If successful, save the token and update login state
     localStorage.setItem('token', response.data.token);
-    axios.defaults.headers['Authorization'] = `Bearer ${response.data.token}`;
     setToken(response.data.token);
     setIsLoggedIn(true);
   } catch (error) {
-    // Handle login failure
     alert('Invalid credentials');
   }
 };
 
-
+const handleLogout = () => {
+  localStorage.removeItem('token');
+  delete axios.defaults.headers['Authorization'];
+};
 
   // Fetch inventory items
   const reloadInventory = () => {
@@ -111,7 +111,11 @@ const handleLogin = async (username, password) => {
 
   const handleConfirmDelete = () => {
     // Proceed with deletion
-    axios.delete(`https://inventory-server-eight.vercel.app/api/items/${itemToDelete._id}`)
+    axios.delete(`https://inventory-server-eight.vercel.app/api/items/${itemToDelete._id}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,  // Attach the token in Authorization header
+      }
+    })
       .then(() => {
         setInventory(prevInventory => prevInventory.filter(item => item._id !== itemToDelete._id));
         setOpenDeleteDialog(false); // Close the dialog after deletion
@@ -160,10 +164,13 @@ const handleLogin = async (username, password) => {
 
   return (
     <main className="main">
+
           {!isLoggedIn && <LoginModal onLogin={handleLogin} />}
           {isLoggedIn && (
             <>
       <h1>Welcome to Cenix Inventory System</h1>
+
+      <button onClick={handleLogout}>Logout</button>
 
 
       <div className="tableToggle" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
@@ -255,10 +262,14 @@ const handleLogin = async (username, password) => {
           setSelectedItem(null);
         }}
         addItem={(newItem) => {
-          axios.post('https://inventory-server-eight.vercel.app/api/items', newItem)
+          axios.post('https://inventory-server-eight.vercel.app/api/items', newItem, {
+            headers: {
+              'Authorization': `Bearer ${token}`,  // Attach the token here
+            }
+          })
             .then((response) => {
-              setInventory(prevInventory => [...prevInventory, response.data]);
-              setOpenModal(false);
+              setInventory(prevInventory => [...prevInventory, response.data]); // Add new item to inventory
+              setOpenModal(false); // Close the modal
             })
             .catch((error) => {
               console.error('Error adding item:', error);
@@ -266,7 +277,11 @@ const handleLogin = async (username, password) => {
         }}
 
         updateItem={(updatedItem) => {
-          axios.patch(`https://inventory-server-eight.vercel.app/api/items/${updatedItem._id}`, updatedItem)
+          axios.patch(`https://inventory-server-eight.vercel.app/api/items/${updatedItem._id}`, updatedItem, {
+            headers: {
+              'Authorization': `Bearer ${token}`,  // Attach the token in Authorization header
+            }
+          })
             .then((response) => {
               setInventory(prevInventory => 
                 prevInventory.map(item => item._id === updatedItem._id ? updatedItem : item)
