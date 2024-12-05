@@ -32,7 +32,8 @@ const OfficeTable = () => {
     setLoading(true);
     axios.get('https://inventory-server-eight.vercel.app/api/tables') // Fetch tables from the backend
       .then(response => {
-        setTables(response.data); // Set the tables with assigned items
+        const sortedTables = response.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        setTables(sortedTables); // Set the tables with assigned items
       })
       .catch(error => {
         console.error('Error fetching tables:', error);

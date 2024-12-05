@@ -9,8 +9,8 @@ import OfficeTable from './components/OfficeTable';
 import * as XLSX from 'xlsx';
 import DownloadIcon from '@mui/icons-material/Download';
 import LoginModal from './components/LoginModal';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import AppRoutes from './components/AppRoutes'; 
+import * as jwtDecodeModule from 'jwt-decode';
+const jwt_decode = jwtDecodeModule.default;
 
 function App() {
   const [inventory, setInventory] = useState([]);
@@ -35,8 +35,22 @@ useEffect(() => {
 useEffect(() => {
   const storedToken = localStorage.getItem('token'); // Check if token exists in localStorage
   if (storedToken) {
-    setToken(storedToken);  // Set token state if it exists
-    setIsLoggedIn(true);  // Mark user as logged in
+    try {
+      // Decode the token and check expiration
+      const decodedToken = jwt_decode(storedToken);
+      const currentTime = Date.now() / 1000; // Current time in seconds
+
+      if (decodedToken.exp < currentTime) {
+        // Token is expired, log out the user
+        handleLogout();
+      } else {
+        setToken(storedToken);  // Set token state if it's valid
+        setIsLoggedIn(true);  // Mark user as logged in
+      }
+    } catch (error) {
+      console.error("Error decoding token:", error);
+      handleLogout();  // Logout if token is invalid
+    }
   }
 }, []);
 
@@ -58,7 +72,10 @@ const handleLogin = async (username, password) => {
 const handleLogout = () => {
   localStorage.removeItem('token');
   delete axios.defaults.headers['Authorization'];
+  setToken(null);
+  setIsLoggedIn(false);
 };
+
 
   // Fetch inventory items
   const reloadInventory = () => {
@@ -76,15 +93,15 @@ const handleLogout = () => {
   
   const handleEditItem = (item) => {
 
-    const newItem = { ...item }; // Create a copy of the previous state
+    const newItem = { ...item }; 
 
     if (newItem.status === 'available' && newItem.assignedTo) {
-      newItem.assignedTo = ''; // Reset assignedTo if status is 'available'
+      newItem.assignedTo = ''; 
     }
   
     if (newItem.status === 'disposed') {
-      newItem.assignedTo = '';  // Reset assignedTo if status is 'disposed'
-      newItem.location = '';    // Reset location if status is 'disposed'
+      newItem.assignedTo = '';  
+      newItem.location = '';   
     }
   
     
@@ -210,9 +227,6 @@ const handleLogout = () => {
       )}
 
 
-
-
-
       {/* Conditionally render components based on selectedTable */}
       {selectedTable === 'inventory' && (
         <>
@@ -254,7 +268,6 @@ const handleLogout = () => {
       </DialogActions>
     </Dialog>
 
-      {/* Modals */}
       <AddItemModal
         open={openModal}
         onClose={()=> {
@@ -275,7 +288,6 @@ const handleLogout = () => {
               console.error('Error adding item:', error);
             });
         }}
-
         updateItem={(updatedItem) => {
           axios.patch(`https://inventory-server-eight.vercel.app/api/items/${updatedItem._id}`, updatedItem, {
             headers: {
@@ -293,8 +305,8 @@ const handleLogout = () => {
             });
         }}
         editItem={selectedItem}
-
       />
+
          </> )}
     </main>
   );
