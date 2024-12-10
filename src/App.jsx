@@ -10,7 +10,7 @@ import * as XLSX from 'xlsx';
 import DownloadIcon from '@mui/icons-material/Download';
 import LoginModal from './components/LoginModal';
 import * as jwtDecodeModule from 'jwt-decode';
-const jwt_decode = jwtDecodeModule.default;
+
 
 function App() {
   const [inventory, setInventory] = useState([]);
@@ -33,23 +33,18 @@ useEffect(() => {
 }, []);
 
 useEffect(() => {
-  const storedToken = localStorage.getItem('token'); // Check if token exists in localStorage
-  if (storedToken) {
-    try {
-      // Decode the token and check expiration
-      const decodedToken = jwt_decode(storedToken);
-      const currentTime = Date.now() / 1000; // Current time in seconds
+  const storedToken = localStorage.getItem('token');
+  const expirationTime = localStorage.getItem('tokenExpiration');
 
-      if (decodedToken.exp < currentTime) {
-        // Token is expired, log out the user
-        handleLogout();
-      } else {
-        setToken(storedToken);  // Set token state if it's valid
-        setIsLoggedIn(true);  // Mark user as logged in
-      }
-    } catch (error) {
-      console.error("Error decoding token:", error);
-      handleLogout();  // Logout if token is invalid
+  if (storedToken && expirationTime) {
+    const currentTime = Date.now();
+    if (currentTime > parseInt(expirationTime, 10)) {
+      // Token expired - logout
+      handleLogout();
+    } else {
+      // Token is still valid
+      setToken(storedToken);
+      setIsLoggedIn(true);
     }
   }
 }, []);
@@ -61,21 +56,27 @@ const handleLogin = async (username, password) => {
       username,
       password,
     });
-    localStorage.setItem('token', response.data.token);
-    setToken(response.data.token);
+
+    const token = response.data.token;
+    const expiresIn = response.data.expiresIn * 1000; // Convert seconds to milliseconds
+    const expirationTime = Date.now() + expiresIn;
+
+    localStorage.setItem('token', token);
+    localStorage.setItem('tokenExpiration', expirationTime.toString());
+
+    setToken(token);
     setIsLoggedIn(true);
   } catch (error) {
     alert('Invalid credentials');
   }
 };
-
 const handleLogout = () => {
   localStorage.removeItem('token');
+  localStorage.removeItem('tokenExpiration');
   delete axios.defaults.headers['Authorization'];
   setToken(null);
   setIsLoggedIn(false);
 };
-
 
   // Fetch inventory items
   const reloadInventory = () => {
