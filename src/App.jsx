@@ -36,7 +36,10 @@ useEffect(() => {
   // Check if token exists in sessionStorage to determine login status
   const token = sessionStorage.getItem('token');
   if (token) {
+    setToken(token);
     setIsLoggedIn(true);
+  } else {
+    setIsLoggedIn(false);
   }
 }, []);
 

@@ -21,7 +21,8 @@ const LoginModal = ({ onLoginSuccess }) => {
       const response = await fetch('https://inventory-server-eight.vercel.app/api/auth/login', {
         method: 'POST',
         body: JSON.stringify({ username, password }),
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', }
+      
       });
 
       const data = await response.json();
