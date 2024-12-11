@@ -45,7 +45,7 @@ color: #fff;
   body {
     text-transform: uppercase;
     overflow-x: hidden;
-    max-height: 100vh;
+   height: 100vh;
 background-color: #fff!important;
 overflow-y: scroll ;
   }
