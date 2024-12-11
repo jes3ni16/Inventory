@@ -47,4 +47,5 @@ color: #fff;
     overflow-x: hidden;
     max-height: 100vh;
 background-color: #fff!important;
+overflow-y: scroll ;
   }
