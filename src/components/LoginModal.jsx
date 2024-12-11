@@ -1,13 +1,43 @@
 import React, { useState } from 'react';
-import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button } from '@mui/material';
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+  Button,
+  Typography,
+} from '@mui/material';
 
-const LoginModal = ({ onLogin }) => {
+const LoginModal = ({ onLoginSuccess }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onLogin(username, password); // Trigger login on parent component
+
+    try {
+      const response = await fetch('https://inventory-server-eight.vercel.app/api/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ username, password }),
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Successful login
+        sessionStorage.setItem('token', data.token); // Store token in sessionStorage
+        onLoginSuccess();
+        setError('');
+      } else {
+        setError(data.error || 'Login failed');
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      setError('Something went wrong. Please try again later.');
+    }
   };
 
   return (
@@ -36,6 +66,11 @@ const LoginModal = ({ onLogin }) => {
               required
             />
           </div>
+          {error && (
+            <Typography color="error" style={{ marginBottom: '8px' }}>
+              {error}
+            </Typography>
+          )}
           <DialogActions>
             <Button type="submit" color="primary">
               Login

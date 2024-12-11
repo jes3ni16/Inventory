@@ -33,48 +33,19 @@ useEffect(() => {
 }, []);
 
 useEffect(() => {
-  const storedToken = localStorage.getItem('token');
-  const expirationTime = localStorage.getItem('tokenExpiration');
-
-  if (storedToken && expirationTime) {
-    const currentTime = Date.now();
-    if (currentTime > parseInt(expirationTime, 10)) {
-      // Token expired - logout
-      handleLogout();
-    } else {
-      // Token is still valid
-      setToken(storedToken);
-      setIsLoggedIn(true);
-    }
+  // Check if token exists in sessionStorage to determine login status
+  const token = sessionStorage.getItem('token');
+  if (token) {
+    setIsLoggedIn(true);
   }
 }, []);
 
-
-const handleLogin = async (username, password) => {
-  try {
-    const response = await axios.post('https://inventory-server-eight.vercel.app/api/auth/login', {
-      username,
-      password,
-    });
-
-    const token = response.data.token;
-    const expiresIn = response.data.expiresIn * 1000; // Convert seconds to milliseconds
-    const expirationTime = Date.now() + expiresIn;
-
-    localStorage.setItem('token', token);
-    localStorage.setItem('tokenExpiration', expirationTime.toString());
-
-    setToken(token);
-    setIsLoggedIn(true);
-  } catch (error) {
-    alert('Invalid credentials');
-  }
+const handleLoginSuccess = () => {
+  setIsLoggedIn(true);
 };
+
 const handleLogout = () => {
-  localStorage.removeItem('token');
-  localStorage.removeItem('tokenExpiration');
-  delete axios.defaults.headers['Authorization'];
-  setToken(null);
+  sessionStorage.removeItem('token'); // Clear token from sessionStorage
   setIsLoggedIn(false);
 };
 
@@ -183,7 +154,7 @@ const handleLogout = () => {
   return (
     <main className="main">
 
-          {!isLoggedIn && <LoginModal onLogin={handleLogin} />}
+          {!isLoggedIn && <LoginModal onLoginSuccess={handleLoginSuccess} />}
           {isLoggedIn && (
             <>
       <h1>Welcome to Cenix Inventory System</h1>
