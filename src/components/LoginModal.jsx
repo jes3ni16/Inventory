@@ -30,8 +30,9 @@ const LoginModal = ({ onLoginSuccess }) => {
       if (response.ok) {
         // Successful login
         sessionStorage.setItem('token', data.token); // Store token in sessionStorage
-        onLoginSuccess();
+
         setError('');
+        window.location.reload(); // Reload the page
       } else {
         setError(data.error || 'Login failed');
       }

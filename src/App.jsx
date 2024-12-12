@@ -9,7 +9,7 @@ import OfficeTable from './components/OfficeTable';
 import * as XLSX from 'xlsx';
 import DownloadIcon from '@mui/icons-material/Download';
 import LoginModal from './components/LoginModal';
-import * as jwtDecodeModule from 'jwt-decode';
+
 
 
 function App() {
@@ -33,18 +33,18 @@ useEffect(() => {
 }, []);
 
 useEffect(() => {
-  // Check if token exists in sessionStorage to determine login status
-  const token = sessionStorage.getItem('token');
-  if (token) {
-    setToken(token);
+  const savedToken = sessionStorage.getItem('token');
+  if (savedToken) {
+    setToken(savedToken);
     setIsLoggedIn(true);
-  } else {
-    setIsLoggedIn(false);
   }
 }, []);
 
-const handleLoginSuccess = () => {
+const handleLoginSuccess = (token) => {
+  sessionStorage.setItem('token', token);
+  setToken(token);
   setIsLoggedIn(true);
+  console.log('Logged in with token:', token);
 };
 
 const handleLogout = () => {
@@ -81,7 +81,7 @@ const handleLogout = () => {
   
     
     setSelectedItem(item);
-    setOpenModal(true); // Open the modal to edit
+    setOpenModal(true);
     return newItem; 
 
   };
@@ -90,19 +90,17 @@ const handleLogout = () => {
     reloadInventory();
   }, []);
 
-  // Handle delete of an inventory item
+
   const handleDeleteItem = (itemId) => {
-    // Find the item to be deleted
     const itemToDelete = inventory.find(item => item._id === itemId);
   
     if (itemToDelete) {
       setItemToDelete(itemToDelete);
-      setOpenDeleteDialog(true); // Open the confirmation dialog
+      setOpenDeleteDialog(true); 
     }
   };
 
   const handleConfirmDelete = () => {
-    // Proceed with deletion
     axios.delete(`https://inventory-server-eight.vercel.app/api/items/${itemToDelete._id}`, {
       headers: {
         'Authorization': `Bearer ${token}`,  // Attach the token in Authorization header
@@ -119,7 +117,6 @@ const handleLogout = () => {
   };
 
   const handleCancelDelete = () => {
-    // Just close the dialog without doing anything
     setOpenDeleteDialog(false);
   };
 
